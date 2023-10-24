@@ -3,13 +3,8 @@
 # Table of contents
 - ## [Contest Summary](#contest-summary)
 - ## [Results Summary](#results-summary)
-- ## High Risk Findings
-    - ### [H-01. Vulnerable to Reentrancy attack](#H-01)
 - ## Medium Risk Findings
     - ### [M-01. Vulnerable to Reentrancy Attack](#M-01)
-    - ### [M-02. unchecked-transfer](#M-02)
-    - ### [M-03. unchecked-transfer](#M-03)
-    - ### [M-04. arbitrary-send-erc20 (NO authorization)](#M-04)
 
 
 
@@ -24,30 +19,9 @@
 # <a id='results-summary'></a>Results Summary
 
 ### Number of findings:
-   - High: 1
-   - Medium: 4
+   - High: 0
+   - Medium: 1
    - Low: 0
-
-
-# High Risk Findings
-
-## <a id='H-01'></a>H-01. Vulnerable to Reentrancy attack            
-
-### Relevant GitHub Links
-	
-https://github.com/Cyfrin/2023-07-beedle/blob/658e046bda8b010a5b82d2d85e824f3823602d27/src/Lender.sol#L402-L432
-
-## Vulnerability Details
-The vulnerability occurs because the `giveLoan` function performs an external call to `IERC20(loan.loanToken).transfer(feeReceiver, protocolInterest)` before updating the state variables. If the external contract being called (i.e., `IERC20(loan.loanToken)`) triggers a reentrant call back into the `giveLoan` function or any other function in the contract before the state variables are updated.
-
-## Impact
-The impact of the reentrancy vulnerability in the `giveLoan` function could lead to potential loss of funds or even manipulation of state variables during loan processing due to an external contract calling back into the function before the state is updated, allowing malicious actors to exploit the contract.
-
-## Tools Used
-Slither
-
-## Recommendations or Mitigation
-To mitigate this vulnerability, the checks-effects-interactions pattern should be followed to ensure the state is updated before any external calls are made. 
 
 
 		
@@ -194,80 +168,6 @@ function refinance(uint256 loanId, uint256 poolId) external nonReentrant {
 
 By following the "Checks-Effects-Interactions" pattern, you ensure that the state is updated correctly before any external calls are made, making the contract safer against reentrancy vulnerabilities
 
-
-
-## <a id='M-02'></a>M-02. unchecked-transfer            
-
-### Relevant GitHub Links
-	
-https://github.com/Cyfrin/2023-07-beedle/blob/658e046bda8b010a5b82d2d85e824f3823602d27/src/Lender.sol#L317C1-L327
-
-## Vulnerability Details
-In both cases, the contract calls the transferFrom function to transfer tokens from the msg.sender (the borrower) to another address (address(this) or feeReceiver). However, the code does not check the return values of these transfer functions.
-
-## Impact
-The impact of ignoring the return value of `transferFrom` functions is that the contract may not correctly account for token transfers, leading to consequences like the loss of tokens or incomplete transaction reversals on transfer failures, potentially resulting in financial loss
-
-## Tools Used
-Slither
-
-## Recommendations or Mitigation
-The mitigation for this issue is to handle the return values of the transferFrom functions using a require statement to check the success of the transfers and react appropriately if the transfer fails.
-
-## <a id='M-03'></a>M-03. unchecked-transfer            
-
-### Relevant GitHub Links
-	
-https://github.com/Cyfrin/2023-07-beedle/blob/658e046bda8b010a5b82d2d85e824f3823602d27/src/Lender.sol#L267
-
-## Vulnerability Details
-The contract transfers fees amount of tokens to the 'feeReceiver' address without checking the return value of the transfer function
-
-## Impact
-If the transfer function fails due to reasons like invalid transactions or insufficient balance, it can lead to unintended consequences. For example, the fees amount may not be correctly collected, affecting the revenue for the protocol.
-
-## Tools Used
-Slither
-
-## Recommendations or mitigation: To mitigate this issue, first reduce contract size, you can consider using error codes or constants instead of string literals in revert statements. Error codes or constants are stored more efficiently in the contract's bytecode, leading to smaller contract sizes. Then handle the return value (or error codes) of the transfer function. Example shown below:
-    require(
-    IERC20(loan.loanToken).transfer(feeReceiver, fees),
-    "Token transfer to feeReceiver failed"
-);
-
-
-## <a id='M-04'></a>M-04. arbitrary-send-erc20 (NO authorization)            
-
-### Relevant GitHub Links
-	
-https://github.com/Cyfrin/2023-07-beedle/blob/658e046bda8b010a5b82d2d85e824f3823602d27/src/Lender.sol#L152-L155
-
-## Vulnerability Details
-The 'transferFrom' function is being called without checking whether the p.lender address has approved the Lender contract to spend tokens on its behalf
-
-## Impact
-The vulnerability allows unauthorized token transfers from the p.lender address, leading to potential loss of funds for the user and exposing them to financial risks if exploited.
-## Tools Used
-Slither
-## mitigation: To mitigate this issue, first reduce contract size; you can consider using error codes or constants instead of string literals in revert statements. Error codes or constants are stored more efficiently in the contract's bytecode, leading to smaller contract sizes. Then either use revert statement or error codes to ensure that the 'Lender' contract is authorised to transfer tokens on behalf of the p.lender address. This prevents unauthorized token transfers and also enhances the security of a contract.
-
-Could look something like this; if (p.poolBalance > currentBalance) {
-        // Ensure that the Lender contract is allowed to transfer tokens from p.lender
-        uint256 transferAmount = p.poolBalance - currentBalance;
-        require(
-            IERC20(p.loanToken).allowance(p.lender, address(this)) >= transferAmount,
-            "Lender not authorized to transfer tokens"
-        );
-
-OR
-
-if (p.poolBalance > currentBalance) {
-        // Ensure that the Lender contract is allowed to transfer tokens from p.lender
-        uint256 transferAmount = p.poolBalance - currentBalance;
-        require(
-            IERC20(p.loanToken).allowance(p.lender, address(this)) >= transferAmount,
-            ERR_NOT_AUTHORIZED
-        );
 
 
 
