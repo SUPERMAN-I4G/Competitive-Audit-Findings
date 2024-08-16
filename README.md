@@ -19,6 +19,8 @@ In my journey as an auditor, I've had the privilege of participating in competit
 This repository is organized as follows:
 
 - BeedleFi : Detailed reports and documentation related to vulnerabilities discovered during the contest.
+- TempleGold : Detailed reports and documentation related to vulnerabilities discovered during the contest.
+- Zivoe : Detailed reports and documentation related to vulnerabilities discovered during the contest.
 
 ## Getting Started
 
