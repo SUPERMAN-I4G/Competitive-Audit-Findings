@@ -14,7 +14,7 @@
 - Low: 0
 
 ## High Risk Findings
-    - ### [Spillage of Funds or Reward Tokens Due To Rounding](https://github.com/sherlock-audit/2024-03-zivoe-judging/issues/412#issue-2263975586)
+[Spillage of Funds or Reward Tokens Due To Rounding](https://github.com/sherlock-audit/2024-03-zivoe-judging/issues/412#issue-2263975586)
 ## Medium Risk Findings
-    - ### [Temporary or Permanent Loss of Initial Rewards](https://github.com/sherlock-audit/2024-03-zivoe-judging/issues/371#issue-2263969261)
+[Temporary or Permanent Loss of Initial Rewards](https://github.com/sherlock-audit/2024-03-zivoe-judging/issues/371#issue-2263969261)
 
